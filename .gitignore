@@ -1,11 +1,1 @@
 
-build/
-install/
-log/
-__pycache__/
-*.pyc
-*.pyo
-.vscode/
-*.stl
-*.dae
-*.bag
