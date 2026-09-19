@@ -18,13 +18,41 @@
 
 #include <stdint.h>
 #include "stm32f446re.h"
+#include "gpio.h"
 
 #if !defined(__SOFT_FP__) && defined(__ARM_FP)
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+static void delay(uint32_t time){
+
+   for (int i=0;i<time;i++){
+	   __asm__ volatile("nop");
+
+   }
+
+}
+
 int main(void)
 {
-    /* Loop forever */
-	for(;;);
+	GPIO_HANDLE GpioLed;
+	GpioLed.pGPIOx = GPIOA;
+
+	GpioLed.GPIO_pincfg.pinNumber  = 5;
+	GpioLed.GPIO_pincfg.pinMode    = GPIO_OMODE;
+	GpioLed.GPIO_pincfg.oputMode   = GPIO_OUTTYP_PP;
+	GpioLed.GPIO_pincfg.oputSpeed  = GPIO_OSPEED_LOW ;
+	GpioLed.GPIO_pincfg.pupdMode   = GPIO_NO_PHPL ;
+
+	GPIO_PeriCLKEN(GPIOA, ENABLE);
+	GPIO_Init(&GpioLed);
+
+    while (1){
+
+     GPIO_Writetopin(GPIOA , GPIO_PIN_NO_5 , GPIO_PIN_RESET);
+     delay(100000);
+     GPIO_Writetopin(GPIOA ,GPIO_PIN_NO_5 , GPIO_PIN_SET);
+     delay(100000);
+
+    }
 }

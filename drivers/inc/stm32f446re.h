@@ -8,6 +8,43 @@
 #ifndef INC_STM32F446RE_H_
 #define INC_STM32F446RE_H_
 #include <stdint.h>
+
+//Processor Specific Macros For EXTI lines To nvic
+
+// NVIC reg macros
+
+#define NVIC_ISER_BASE  (volatile uint32_t*)(0xE000E100)
+#define NVIC_ICER_BASE  (volatile uint32_t*)(0XE000E180)
+
+#define NVIC_ISER0  (NVIC_ICER_BASE + 0x00) //(0-31)
+#define NVIC_ISER1	(NVIC_ICER_BASE + 0x04)
+#define NVIC_ISER2	(NVIC_ICER_BASE + 0x08)
+#define NVIC_ISER3	(NVIC_ICER_BASE + 0x0C)
+
+#define NVIC_ICER0  (NVIC_ICER_BASE + 0x00) //(0-31)
+#define NVIC_ICER1	(NVIC_ICER_BASE + 0x04)
+#define NVIC_ICER2	(NVIC_ICER_BASE + 0x08)
+#define NVIC_ICER3	(NVIC_ICER_BASE + 0x0C)
+
+#define EXTI_LINE0      (0U)
+#define EXTI_LINE1      (1U)
+#define EXTI_LINE2      (2U)
+#define EXTI_LINE3      (3U)
+#define EXTI_LINE4      (4U)
+
+#define EXTI_LINE5      (5U)
+#define EXTI_LINE6      (6U)
+#define EXTI_LINE7      (7U)
+#define EXTI_LINE8      (8U)
+#define EXTI_LINE9      (9U)
+
+#define EXTI_LINE10     (10U)
+#define EXTI_LINE11     (11U)
+#define EXTI_LINE12     (12U)
+#define EXTI_LINE13     (13U)
+#define EXTI_LINE14     (14U)
+#define EXTI_LINE15     (15U)
+
 /*Base address of flash and SRAM and ROM */
 
 #define FLASH_BASEADDR         0x08000000U //or (uint32_t) 0x08000000
@@ -63,7 +100,7 @@ typedef struct {
 	volatile uint32_t GPIO_LCKR;    //prevents accidental config during runtime
 	volatile uint32_t GPIO_AFR[2];	//AFR[0]:Alternate func reg for Pin 0-7 and AFR[1]:pin 8-15
 
-}GPIO_Regdef;
+}GPIO_RegDef;
 
 /* Base addresses of ports  Every GPIO lies on AHB1 bus and every port has 16 pins and consume 40 bytes
     (4bytes per reg * 10 reg) per port remaining goes in padding and stuff */
@@ -77,14 +114,14 @@ typedef struct {
 #define GPIOH_BASEADDR     (AHB1_BASEADDR + 0x1C00U)
 
 /* Peripheral Base Addresses cast directly to Struct Pointers */
-#define GPIOA              ((GPIO_STRUCT *)GPIOA_BASEADDR)
-#define GPIOB              ((GPIO_STRUCT *)GPIOB_BASEADDR)
-#define GPIOC              ((GPIO_STRUCT *)GPIOC_BASEADDR)
-#define GPIOD              ((GPIO_STRUCT *)GPIOD_BASEADDR)
-#define GPIOE              ((GPIO_STRUCT *)GPIOE_BASEADDR)
-#define GPIOF              ((GPIO_STRUCT *)GPIOF_BASEADDR)
-#define GPIOG              ((GPIO_STRUCT *)GPIOG_BASEADDR)
-#define GPIOH              ((GPIO_STRUCT *)GPIOH_BASEADDR)
+#define GPIOA              ((GPIO_RegDef *)GPIOA_BASEADDR)
+#define GPIOB              ((GPIO_RegDef *)GPIOB_BASEADDR)
+#define GPIOC              ((GPIO_RegDef *)GPIOC_BASEADDR)
+#define GPIOD              ((GPIO_RegDef *)GPIOD_BASEADDR)
+#define GPIOE              ((GPIO_RegDef *)GPIOE_BASEADDR)
+#define GPIOF              ((GPIO_RegDef *)GPIOF_BASEADDR)
+#define GPIOG              ((GPIO_RegDef *)GPIOG_BASEADDR)
+#define GPIOH              ((GPIO_RegDef *)GPIOH_BASEADDR)
 
 typedef struct {
     volatile uint32_t CR;         /* 0x00: RCC clock control register */
@@ -124,37 +161,142 @@ typedef struct {
 #define RCC                ((RCC_TypeDef *)RCC_BASEADDR)
 
 
-#define GPIOA_CLKEN()   RCC->AHB1ENR |= (1<<0);
-#define GPIOB_CLKEN()   RCC->AHB1ENR |= (1<<1);
-#define GPIOC_CLKEN()   RCC->AHB1ENR |= (1<<2);
-#define GPIOD_CLKEN()   RCC->AHB1ENR |= (1<<3);
-#define GPIOE_CLKEN()   RCC->AHB1ENR |= (1<<4);
-#define GPIOF_CLKEN()   RCC->AHB1ENR |= (1<<5);
-#define GPIOG_CLKEN()   RCC->AHB1ENR |= (1<<6);
-#define GPIOH_CLKEN()   RCC->AHB1ENR |= (1<<7);
+#define GPIOA_CLKEN()   RCC->AHB1ENR |= (1<<0)
+#define GPIOB_CLKEN()   RCC->AHB1ENR |= (1<<1)
+#define GPIOC_CLKEN()   RCC->AHB1ENR |= (1<<2)
+#define GPIOD_CLKEN()   RCC->AHB1ENR |= (1<<3)
+#define GPIOE_CLKEN()   RCC->AHB1ENR |= (1<<4)
+#define GPIOF_CLKEN()   RCC->AHB1ENR |= (1<<5)
+#define GPIOG_CLKEN()   RCC->AHB1ENR |= (1<<6)
+#define GPIOH_CLKEN()   RCC->AHB1ENR |= (1<<7)
 
 
-#define I2C1_CLKEN()    RCC->APB1ENR |= (1<<21);
-#define SPI1_CLKEN()    RCC->APB2ENR |= (1<<12);
-#define USART1_CLKEN()  RCC->APB2ENR |= (1<<4);
-#define UART4_CLKEN()   RCC->APB1ENR |= (1<<19);
+#define I2C1_CLKEN()    RCC->APB1ENR |= (1<<21)
+#define SPI1_CLKEN()    RCC->APB2ENR |= (1<<12)
+#define USART1_CLKEN()  RCC->APB2ENR |= (1<<4)
+#define UART4_CLKEN()   RCC->APB1ENR |= (1<<19)
 
-#define GPIOA_CLKD()   RCC->AHB1ENR &= ~(1<<0);
-#define GPIOB_CLKD()   RCC->AHB1ENR &= ~(1<<1);
-#define GPIOC_CLKD()   RCC->AHB1ENR &= ~(1<<2);
-#define GPIOD_CLKD()   RCC->AHB1ENR &= ~(1<<3);
-#define GPIOE_CLKD()   RCC->AHB1ENR &= ~(1<<4);
-#define GPIOF_CLKD()   RCC->AHB1ENR &= ~(1<<5);
-#define GPIOG_CLKD()   RCC->AHB1ENR &= ~(1<<6);
-#define GPIOH_CLKD()   RCC->AHB1ENR &= ~(1<<7);
+#define GPIOA_CLKD()   RCC->AHB1ENR &= ~(1<<0)
+#define GPIOB_CLKD()   RCC->AHB1ENR &= ~(1<<1)
+#define GPIOC_CLKD()   RCC->AHB1ENR &= ~(1<<2)
+#define GPIOD_CLKD()   RCC->AHB1ENR &= ~(1<<3)
+#define GPIOE_CLKD()   RCC->AHB1ENR &= ~(1<<4)
+#define GPIOF_CLKD()   RCC->AHB1ENR &= ~(1<<5)
+#define GPIOG_CLKD()   RCC->AHB1ENR &= ~(1<<6)
+#define GPIOH_CLKD()   RCC->AHB1ENR &= ~(1<<7)
 
 
-#define I2C1_CLKD()    RCC->APB1ENR &= ~(1<<21);
-#define SPI1_CLKD()    RCC->APB2ENR &= ~(1<<12);
-#define USART1_CLKD()  RCC->APB2ENR &= ~(1<<4);
-#define UART4_CLKD()   RCC->APB1ENR &= ~(1<<19);
+#define I2C1_CLKD()    RCC->APB1ENR &= ~(1<<21)
+#define SPI1_CLKD()    RCC->APB2ENR &= ~(1<<12)
+#define USART1_CLKD()  RCC->APB2ENR &= ~(1<<4)
+#define UART4_CLKD()   RCC->APB1ENR &= ~(1<<19)
 
-#define SYSCLKCFG()   RCC->APB2ENR |= (1<<14);
-#define SYSCLKCFGD()  RCC->APB2ENR &= ~(1<<14);
+#define SYSCLKCFG()   RCC->APB2ENR |= (1<<14)
+#define SYSCLKCFGD()  RCC->APB2ENR &= ~(1<<14)
+
+
+/* GenricMacros*/
+
+#define ENABLE  1
+#define DISABLE 0
+
+#define SET   ENABLE
+#define RESET DISABLE
+
+#define GPIO_PIN_SET    SET
+#define GPIO_PIN_RESET  RESET
+
+#define GPIO_IMODE   0
+#define GPIO_OMODE   1
+#define GPIO_ALTMODE 2
+#define GPIO_AMODE   3
+
+#define GPIO_IT_RT      4
+#define GPIO_IT_FT      5
+#define GPIO_IT_RFT     6
+
+#define GPIO_OUTTYP_PP   0
+#define GPIO_OUTTYP_OD   1
+
+#define GPIO_OSPEED_LOW     0
+#define GPIO_OSPEED_MEDIUM  1
+#define GPIO_OSPEED_FAST    2
+#define GPIO_OSPEED_HIGH    3
+
+#define GPIO_NO_PHPL   0
+#define GPIO_PIN_PULLUP    1
+#define GPIO_PIN_PULLDOWN  2
+
+#define GPIO_PIN_NO_0   0
+#define GPIO_PIN_NO_1   1
+#define GPIO_PIN_NO_2   2
+#define GPIO_PIN_NO_3   3
+#define GPIO_PIN_NO_4   4
+#define GPIO_PIN_NO_5   5
+#define GPIO_PIN_NO_6   6
+#define GPIO_PIN_NO_7   7
+#define GPIO_PIN_NO_8   8
+#define GPIO_PIN_NO_9   9
+#define GPIO_PIN_NO_10  10
+#define GPIO_PIN_NO_11  11
+#define GPIO_PIN_NO_12  12
+#define GPIO_PIN_NO_13  13
+#define GPIO_PIN_NO_14  14
+#define GPIO_PIN_NO_15  15
+
+//GPIO port Reset
+
+#define GPIOA_Reset()   do {RCC->AHB1RSTR |= (1<<0); RCC->AHB1RSTR &= ~(1<<0);} while(0)
+#define GPIOB_Reset()   do {RCC->AHB1RSTR |= (1<<1); RCC->AHB1RSTR &= ~(1<<1);} while(0)
+#define GPIOC_Reset()	do {RCC->AHB1RSTR |= (1<<2); RCC->AHB1RSTR &= ~(1<<2);} while(0)
+#define GPIOD_Reset()   do {RCC->AHB1RSTR |= (1<<3); RCC->AHB1RSTR &= ~(1<<3);} while(0)
+#define GPIOE_Reset()   do {RCC->AHB1RSTR |= (1<<4); RCC->AHB1RSTR &= ~(1<<4);} while(0)
+#define GPIOF_Reset()   do {RCC->AHB1RSTR |= (1<<5); RCC->AHB1RSTR &= ~(1<<5);} while(0)
+#define GPIOG_Reset()   do {RCC->AHB1RSTR |= (1<<6); RCC->AHB1RSTR &= ~(1<<6);} while(0)
+#define GPIOH_Reset()   do {RCC->AHB1RSTR |= (1<<7); RCC->AHB1RSTR &= ~(1<<7);} while(0)
+
+//EXTI PORT LEVELS
+
+
+typedef struct{
+
+	volatile uint32_t IMR;  //Offset - 0x00
+	volatile uint32_t FMR;  //04
+	volatile uint32_t RTSR;   //08
+	volatile uint32_t FTSR;   //0c
+	volatile uint32_t SWIER;   //10
+	volatile uint32_t PR;    //14
+
+}EXTI_RegDef;
+
+#define EXTI ((EXTI_RegDef*)EXTI_BASEADDR)
+
+//SYScFG Peripherals
+
+#define SYSCFG_Peri_CLKEN()   RCC->APB2ENR |= (1<< 14)
+
+typedef struct {
+
+	volatile uint32_t SYSCFG_MEMRMP;
+	volatile uint32_t SYSCFG_PMC;
+	volatile uint32_t SYSCFG_EXTICR[4];
+	uint32_t RESERVED1[2];
+	volatile uint32_t SYSCFG_CMPCR;
+	uint32_t RESERVED2[2];
+	volatile uint32_t SYSCFG_CFGR;
+
+}SYSCFG_RegDef;
+
+#define SYSCFG   ((SYSCFG_RegDef*)SYSCFG_BASEADDR)
+
+#define  GPIO_BASEADDR_TO_CODE(x)                   (x==GPIOA)?0 :\
+			                                        (x==GPIOB)?1 :\
+			                                        (x==GPIOC)?2 :\
+			                                        (x==GPIOD)?3 :\
+			                                        (x==GPIOE)?4 :\
+			                                        (x==GPIOF)?5 :\
+							                    	(x==GPIOG)?6 :\
+							                    	(x==GPIOH)?7 :0
 
 #endif /* INC_STM32F446RE_H_ */
+
